@@ -1,0 +1,17 @@
+
+Get the image URL from redis
+  it exists -> 
+    a) GET the image from storage by the URL
+    b) write the image to the request body
+    c) respond
+    
+  it does not exist -> 
+    
+    - respond with the original image immediately
+
+    then async:
+    - transform the image to create a placeholder
+    - save the placeholder to storage
+    - get the link to file from storage when it is done saving
+    - put the `key:value` in redis: `originalimageURL: storageURL`
+    

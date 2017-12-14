@@ -1,22 +1,35 @@
 package main
 
-import (
-	"fmt"
+// project-id
+// bucket-name
+//
 
-	"github.com/graymeta/stow"
-	"github.com/graymeta/stow/s3"
-)
+// func putItemInStorage() {
+// 	stowLoc, err := stow.Dial(stowgs.Kind, stow.ConfigMap{
+// 		stowgs.ConfigJSON:      "progressify-tool-4a9ec2932afe.json",
+// 		stowgs.ConfigProjectId: "progressify-tool",
+// 	})
 
-func getItemFromStorage() {
-	kind := "s3"
-	config := stow.ConfigMap{
-		s3.ConfigAccessKeyID: "246810",
-		s3.ConfigSecretKey:   "abc123",
-		s3.ConfigRegion:      "eu-west-1",
-	}
-	location, err := stow.Dial(kind, config)
-	if err != nil {
-		fmt.Println("there was and error")
-	}
-	defer location.Close()
-}
+// 	defer stowLoc.Close()
+
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+
+// 	var stowBucket stowgs.Location
+// 	stowBucket, err = stowLoc.Container("progressify-images")
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+
+// 	if gsBucket, ok := stowBucket.(*stowgs.Bucket); ok {
+// 		if gsLoc, ok := stowLoc.(*stowgs.Location); ok {
+
+// 			googleService := gsLoc.Service()
+// 			googleBucket, err := gsBucket.Bucket()
+
+// 			// < Send platform-specific commands here >
+
+// 		}
+// 	}
+// }

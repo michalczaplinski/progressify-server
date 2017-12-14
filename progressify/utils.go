@@ -15,18 +15,21 @@ func getEnv(key, fallback string) string {
 	return fallback
 }
 
-func getImage(response http.ResponseWriter, request *http.Request, imageURL string) {
+func getImage(imageURL string) (*http.Response, error) {
 	imageResp, err := http.Get(imageURL)
 	if err != nil {
-		http.NotFound(response, request)
-		return
+		return nil, err
 	}
 	defer imageResp.Body.Close()
+	return imageResp, nil
+}
+
+func writeImageToResponse(response http.ResponseWriter, imageResp *http.Response) {
 
 	response.Header().Set("Content-Length", fmt.Sprint(imageResp.ContentLength))
 	response.Header().Set("Content-Type", imageResp.Header.Get("Content-Type"))
 
-	_, err = io.Copy(response, imageResp.Body)
+	_, err := io.Copy(response, imageResp.Body)
 	if err != nil {
 		log.Fatal(err)
 		return
