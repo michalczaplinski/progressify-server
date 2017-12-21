@@ -16,11 +16,26 @@ deploy:
 	gcloud app deploy --project progressify-tool ./progressify/app.yaml
 
 test:
-	http localhost:8081/https://www.w3schools.com/css/trolltunga.jpg
-	echo
-	http http://localhost:8081/
 
-	
+	# try to get a key that does not exist
+	http localhost:8081/https://www.w3schools.com/css/trolltunga.jpg
+	#
+	#
+	#
+	# try to get a non-existing URL
+	http localhost:8081/https://www.w3schools.com/css/this_image_does_not_exist.jpg
+	#
+	#
+	#
+	# try to fetch a resource that is not an image
+	curl -L localhost:8081/https://czaplinski.io/
+	#
+	#
+	#
+	# get a key that does exist
+	redis-cli set "https://www.w3schools.com/css/trolltunga.jpg" "https://www.w3schools.com/css/trolltunga.jpg"
+	http localhost:8081/https://www.w3schools.com/css/trolltunga.jpg
+	redis-cli del "https://www.w3schools.com/css/trolltunga.jpg"
 
 # vet:
 # 	go vet $(go list ./... | grep -v /vendor/)
