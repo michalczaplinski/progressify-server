@@ -14,7 +14,7 @@ func indexController(writer http.ResponseWriter, request *http.Request) {
 
 func imageController(response http.ResponseWriter, request *http.Request) {
 
-	// parse the image URL from the querystring
+	// parse the image URL from the route URL
 	vars := mux.Vars(request)
 	imageURL := vars["imageUrl"]
 
@@ -31,24 +31,29 @@ func imageController(response http.ResponseWriter, request *http.Request) {
 	val, err := client.Get(imageURL).Result()
 
 	// if there is no image key in redis
-	if err != nil {
-		fmt.Printf("There is no url: %s", imageURL)
-
-	} else if err == redis.Nil {
-
+	if err == redis.Nil {
 		fmt.Println("key does not exists")
 
 		// get the original image
-		imageResponse, err := getImage(val)
+		imageResponse, err := getImage(imageURL)
+
 		if err != nil {
+			fmt.Println(err)
 			http.NotFound(response, request)
 			return
 		}
+		defer imageResponse.Body.Close()
 
 		writeImageToResponse(response, imageResponse)
 
+	} else if err != nil {
+		fmt.Printf("There was an error in redis retrieving url: %s\n", imageURL)
+
+		//TODO: maybe return something more informative
+
 	} else {
-		fmt.Println("image exists")
+
+		fmt.Printf("image exists: %s", val)
 		// in this case grab the image, resize, save and respond
 
 	}

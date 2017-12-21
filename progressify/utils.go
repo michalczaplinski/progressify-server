@@ -1,11 +1,13 @@
 package main
 
 import (
+	"crypto/tls"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 )
 
 func getEnv(key, fallback string) string {
@@ -16,11 +18,22 @@ func getEnv(key, fallback string) string {
 }
 
 func getImage(imageURL string) (*http.Response, error) {
-	imageResp, err := http.Get(imageURL)
+	transCfg := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // ignore expired SSL certificates
+	}
+	client := &http.Client{Transport: transCfg}
+	imageResp, err := client.Get(imageURL)
+
 	if err != nil {
 		return nil, err
 	}
-	defer imageResp.Body.Close()
+
+	imageContentType := imageResp.Header.Get("Content-Type")
+
+	if !strings.HasPrefix(imageContentType, "image") {
+		return nil, &errWrongContentType{msg: "The image under the url has wrong content type"}
+	}
+
 	return imageResp, nil
 }
 

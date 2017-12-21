@@ -16,8 +16,11 @@ deploy:
 	gcloud app deploy --project progressify-tool ./progressify/app.yaml
 
 test:
-	curl http://localhost:8081/
+	http localhost:8081/https://www.w3schools.com/css/trolltunga.jpg
 	echo
-	curl http://localhost:8081/a
+	http http://localhost:8081/
+
+	
+
 # vet:
 # 	go vet $(go list ./... | grep -v /vendor/)
