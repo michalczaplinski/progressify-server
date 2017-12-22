@@ -9,7 +9,8 @@ install_deps:
 	go get github.com/graymeta/stow
 	go get github.com/graymeta/stow/google
 	go get github.com/graymeta/stow/s3
-
+	go get github.com/smartystreets/goconvey
+	
 	go get github.com/codegangsta/gin
 
 deploy:
