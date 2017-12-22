@@ -3,14 +3,17 @@ start:
 
 install_deps:
 	go get github.com/gorilla/mux
-	go get github.com/gorilla/context
+	# go get github.com/gorilla/context
 	go get github.com/go-redis/redis
-	go get github.com/asaskevich/govalidator
-	go get github.com/graymeta/stow
-	go get github.com/graymeta/stow/google
-	go get github.com/graymeta/stow/s3
+	# go get github.com/asaskevich/govalidator
+	# go get github.com/graymeta/stow
+	# go get github.com/graymeta/stow/google
+	# go get github.com/graymeta/stow/s3
 	go get github.com/smartystreets/goconvey
-	
+	go get github.com/disintegration/imaging
+	go get github.com/pkg/errors
+
+	# DEPENDENCIES FOR LOCAL DEVELOPMENT
 	go get github.com/codegangsta/gin
 
 deploy:

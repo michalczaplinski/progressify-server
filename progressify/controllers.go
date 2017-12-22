@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
 	"net/http"
 
 	"github.com/go-redis/redis"
@@ -12,7 +14,7 @@ func indexController(writer http.ResponseWriter, request *http.Request) {
 	fmt.Fprintf(writer, "Welcome to the HomePage!")
 }
 
-func imageController(response http.ResponseWriter, request *http.Request) {
+func imageController(writer http.ResponseWriter, request *http.Request) {
 
 	// parse the image URL from the route URL
 	vars := mux.Vars(request)
@@ -38,13 +40,34 @@ func imageController(response http.ResponseWriter, request *http.Request) {
 		imageResponse, err := getImage(imageURL)
 
 		if err != nil {
-			fmt.Println(err)
-			http.NotFound(response, request)
+			log.Println(fmt.Sprintf("fetching the image from %s failed!", imageURL))
+			http.NotFound(writer, request)
 			return
 		}
 		defer imageResponse.Body.Close()
 
-		writeImageToResponse(response, imageResponse)
+		imageBytes, err := ioutil.ReadAll(imageResponse.Body)
+		if err != nil {
+			log.Println("could not read the imageResponse body!")
+		}
+		writeImageToResponse(writer, imageBytes)
+		writer.Header().Set("Content-Length", fmt.Sprint(imageResponse.ContentLength))
+		writer.Header().Set("Content-Type", imageResponse.Header.Get("Content-Type"))
+
+		go func() {
+			filename, err := saveFile(imageBytes)
+			if err != nil {
+				log.Println(err)
+				return
+			}
+
+			err = client.Set(imageURL, filename, 0).Err()
+			if err != nil {
+				log.Println(err)
+				return
+			}
+			log.Printf("Saved %s: %s", imageURL, filename)
+		}()
 
 	} else if err != nil {
 		fmt.Printf("There was an error in redis retrieving url: %s\n", imageURL)
@@ -52,9 +75,8 @@ func imageController(response http.ResponseWriter, request *http.Request) {
 		//TODO: maybe return something more informative
 
 	} else {
-
-		fmt.Printf("image exists: %s", val)
-		// in this case grab the image, resize, save and respond
+		fmt.Printf("image exists: %s\n", val)
+		// in this case grab the image and respond
 
 	}
 

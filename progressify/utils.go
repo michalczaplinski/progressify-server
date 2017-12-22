@@ -1,8 +1,8 @@
 package main
 
 import (
+	"bytes"
 	"crypto/tls"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -37,14 +37,11 @@ func getImage(imageURL string) (*http.Response, error) {
 	return imageResp, nil
 }
 
-func writeImageToResponse(response http.ResponseWriter, imageResp *http.Response) {
+func writeImageToResponse(writer http.ResponseWriter, body []byte) {
 
-	response.Header().Set("Content-Length", fmt.Sprint(imageResp.ContentLength))
-	response.Header().Set("Content-Type", imageResp.Header.Get("Content-Type"))
-
-	_, err := io.Copy(response, imageResp.Body)
+	_, err := io.Copy(writer, bytes.NewReader(body))
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return
 	}
 
