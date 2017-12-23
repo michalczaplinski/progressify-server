@@ -15,3 +15,8 @@ Get the image URL from redis
     - get the link to file from storage when it is done saving
     - put the `key:value` in redis: `originalimageURL: storageURL`
     
+
+TODO:
+  - make sure that there are no edge cases in URL parsing with regex
+  - write a fuzz tester that throws a 100 random images at the application
+  - test under "NO NETWORK" conditions

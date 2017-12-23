@@ -10,7 +10,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func saveFile(imageBytes []byte) (string, error) {
+func saveFile(imageBytes []byte, extension string) (string, error) {
 
 	// create the file name base on the image hash
 	hash := sha1.New()
@@ -18,7 +18,7 @@ func saveFile(imageBytes []byte) (string, error) {
 	if err != nil {
 		return "", errors.Wrap(err, "hashing the image failed!")
 	}
-	filename := fmt.Sprintf("%x.jpg", hash.Sum(nil))
+	filename := fmt.Sprintf("%x.%s", hash.Sum(nil), extension)
 
 	// decode the bytes into an image.Image
 	image, _, err := image.Decode(bytes.NewReader(imageBytes))

@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/go-redis/redis"
 	"github.com/gorilla/mux"
@@ -42,7 +43,7 @@ func imageController(writer http.ResponseWriter, request *http.Request) {
 		if err != nil {
 			log.Println(fmt.Sprintf("fetching the image from %s failed!", imageURL))
 			http.NotFound(writer, request)
-			return
+			return // TODO: HTTP Response code
 		}
 		defer imageResponse.Body.Close()
 
@@ -50,12 +51,26 @@ func imageController(writer http.ResponseWriter, request *http.Request) {
 		if err != nil {
 			log.Println("could not read the imageResponse body!")
 		}
+
 		writeImageToResponse(writer, imageBytes)
-		writer.Header().Set("Content-Length", fmt.Sprint(imageResponse.ContentLength))
-		writer.Header().Set("Content-Type", imageResponse.Header.Get("Content-Type"))
+
+		contentType := imageResponse.Header.Get("Content-Type")
+		contentLength := fmt.Sprint(imageResponse.ContentLength)
+		writer.Header().Set("Content-Length", contentLength)
+		writer.Header().Set("Content-Type", contentType)
+
+		splitFilename := strings.Split(imageURL, ".")
+		extension := splitFilename[len(splitFilename)-1]
+		if extension == imageURL || extension == "" {
+
+			// TODO:
+			// This will fail if the URL does not end with the image extension
+			// Parse the contentType header to figure out the extension
+			log.Fatal("Could not figure out the file's extension")
+		}
 
 		go func() {
-			filename, err := saveFile(imageBytes)
+			filename, err := saveFile(imageBytes, extension)
 			if err != nil {
 				log.Println(err)
 				return
@@ -75,8 +90,17 @@ func imageController(writer http.ResponseWriter, request *http.Request) {
 		//TODO: maybe return something more informative
 
 	} else {
-		fmt.Printf("image exists: %s\n", val)
 		// in this case grab the image and respond
+		fmt.Printf("image exists: %s\n", val)
+		imageBytes, err := ioutil.ReadFile(fmt.Sprintf("/tmp/%s", val))
+		if err != nil {
+			log.Print("There was an error reading the file from disk")
+			return // TODO: HTTP Response code
+		}
+
+		//
+		writeImageToResponse(writer, imageBytes)
+		// writer.Header().Set("Content-Type", imageResponse.Header.Get("Content-Type"))
 
 	}
 

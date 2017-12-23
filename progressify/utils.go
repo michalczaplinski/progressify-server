@@ -37,9 +37,9 @@ func getImage(imageURL string) (*http.Response, error) {
 	return imageResp, nil
 }
 
-func writeImageToResponse(writer http.ResponseWriter, body []byte) {
+func writeImageToResponse(writer http.ResponseWriter, imageBytes []byte) {
 
-	_, err := io.Copy(writer, bytes.NewReader(body))
+	_, err := io.Copy(writer, bytes.NewReader(imageBytes))
 	if err != nil {
 		log.Println(err)
 		return
